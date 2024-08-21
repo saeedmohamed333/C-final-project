@@ -1,4 +1,20 @@
 #include <stdio.h>
+#include <stdlib.h>
+
+/*Creating Struct for patient's info*/
+typedef struct P
+{
+    char Name[40];
+    int Age; 
+    char Gender[10];
+    int ID;
+    int Reservation_slot;
+    struct P * Next ;
+}Patient_Info;
+
+Patient_Info * Start = NULL;            //Start Pointer to our linked list
+
+void Add_Patient();                      //Function Prototype
 
 int main()
 {
@@ -33,11 +49,12 @@ int main()
                     scanf("  %c", &Admin_mode);
                     if(Admin_mode == 'a')
                     {
-                        /*add new patient code segment*/
+                        Add_Patient();
                     }
                     else if(Admin_mode == 'e')
                     {
-                        /*edit patient rercord code segment*/
+                        printf("%d\n", Start -> ID);
+                        printf("%s\n", Start -> Name);
                     }
                     else if(Admin_mode == 'r')
                     {
@@ -52,10 +69,11 @@ int main()
                         printf("Invalid Input\n");
                     }
                     count = 3;         //Updating count with a value not < 3 to exit the loop
+                    password = 0;
                 }
                 else
                 {   
-                    printf("Incorrect Password. Please, Try again\n");
+                    printf("Incorrect Password. Please, Try again later\n");
                     count++;
                 }
             }
@@ -98,4 +116,68 @@ int main()
     } while (exit_state);
     
     return 0;
+}
+
+/*Function Implementation*/
+void Add_Patient()
+{
+    int Already_Existing_ID_Flag = 0; 
+
+    /*Adding Patient*/
+    Patient_Info * patient = (Patient_Info*)malloc(sizeof(Patient_Info));
+    patient -> Next = NULL;
+
+    /*Scanning Information*/
+    printf("Enter your Name:");
+    scanf(" %[^\n]s",patient->Name);
+    printf("Enter your Age:");
+    scanf("%d",&patient->Age);
+    printf("Enter your Gender:");
+    scanf(" %[^\n]s",patient->Gender);
+    printf("Enter your ID:");
+    scanf("%d",&patient->ID);
+
+    /*Check on the linkedlist*/
+    if(Start == NULL)
+    {
+        Already_Existing_ID_Flag = 0; //There are no patients so any ID is acceptable
+    }
+    else
+    {
+        Patient_Info * Temp  = Start; 
+        while(Temp!= NULL) 
+        {
+            if(Temp -> ID == patient -> ID)
+            {
+                Already_Existing_ID_Flag = 1;
+            }
+            Temp = Temp -> Next;
+        }
+    }
+
+    if(Already_Existing_ID_Flag == 0)  //Making decision to add patient or not
+    {
+    
+    /*Check on the linkedlist*/
+    if(Start == NULL)
+    {
+        Start = patient;
+    }
+    else
+    {
+        /*Check on the last Patient*/
+        Patient_Info * Temp  = Start; 
+        while(Temp->Next != NULL) //Temp->Next == NULL 
+        {
+            Temp = Temp -> Next;
+        }
+        Temp -> Next = patient; 
+
+    }
+    }
+    else if(Already_Existing_ID_Flag == 1)
+    {
+        free(patient);
+        printf("Sorry, this ID already exists please try again\n");
+    }
 }
