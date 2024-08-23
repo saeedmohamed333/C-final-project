@@ -14,7 +14,8 @@ typedef struct P
 
 Patient_Info * Start = NULL;            //Start Pointer to our linked list
 
-void Add_Patient();                      //Function Prototype
+void Add_Patient();                      //Add Patient Function Prototype
+void Edit_Patient();                     //Edit Patient Function Prototype
 
 int main()
 {
@@ -45,7 +46,7 @@ int main()
                 scanf("%d", &password);
                 if(password == Default_Admin_Password)
                 {
-                    printf("To add new patient record type \"a\" - To edit patient record type \"e\" - To reserve a slot type \"r\" - To Cancel a reservation type \"c\" - Type \"e\" to exit: ");
+                    printf("To add new patient record type \"a\" - To edit patient record type \"e\" - To reserve a slot type \"r\" - To Cancel a reservation type \"c\": ");
                     scanf("  %c", &Admin_mode);
                     if(Admin_mode == 'a')
                     {
@@ -53,8 +54,7 @@ int main()
                     }
                     else if(Admin_mode == 'e')
                     {
-                        printf("%d\n", Start -> ID);
-                        printf("%s\n", Start -> Name);
+                        Edit_Patient();
                     }
                     else if(Admin_mode == 'r')
                     {
@@ -179,5 +179,49 @@ void Add_Patient()
     {
         free(patient);
         printf("Sorry, this ID already exists please try again\n");
+    }
+}
+void Edit_Patient()
+{
+    int Patient_Found_Flag = 0;
+    int Patient_ID = 0;
+
+    printf("Enter the ID of the patient to edit: ");
+    scanf("%d", &Patient_ID);
+
+    /* Searching for the patient with the given ID */
+    Patient_Info *Temp = Start;
+    while (Temp != NULL) 
+    {
+        if (Temp->ID == Patient_ID) 
+        {
+            Patient_Found_Flag = 1;
+            break;
+        }
+        Temp = Temp->Next;
+    }
+
+    if (Patient_Found_Flag == 1)  // Patient found, update their information 
+    {
+       
+        printf("Editing patient record:\n");
+
+        printf("Current Name: %s\n", Temp->Name);
+        printf("Enter new Name: ");
+        scanf(" %[^\n]s", Temp->Name);
+
+        printf("Current Age: %d\n", Temp->Age);
+        printf("Enter new Age: ");
+        scanf("%d", &Temp->Age);
+
+        printf("Current Gender: %s\n", Temp->Gender);
+        printf("Enter new Gender: ");
+        scanf(" %[^\n]s", Temp->Gender);
+
+        printf("Patient record updated successfully.\n");
+    } 
+    else 
+	{
+        printf("Sorry, this ID does not exist. Please try again.\n");  // Patient with the given ID was not found 
     }
 }
