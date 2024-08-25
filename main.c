@@ -8,14 +8,21 @@ typedef struct P
     int Age; 
     char Gender[10];
     int ID;
-    int Reservation_slot;
+    int Reservation_slot;               //Stores Slot number
     struct P * Next ;
 }Patient_Info;
 
 Patient_Info * Start = NULL;            //Start Pointer to our linked list
 
+//2D Array stores slots
+char slots[5][20] = {"2pm to 2:30pm","2:30pm to 3pm","3pm to 3:30pm","4pm to 4:30pm","4:30pm to 5pm"};
+//Array Indicates the available slots  0 -> available   1 -> not available
+int available_slots[5] = {0};  
+
 void Add_Patient();                      //Add Patient Function Prototype
 void Edit_Patient();                     //Edit Patient Function Prototype
+void Reserve_Slot();                     //Reserve Slot Function Protoype
+void Cancel_Reservation();               //Cancel Reservation Function Prototype
 
 int main()
 {
@@ -58,11 +65,11 @@ int main()
                     }
                     else if(Admin_mode == 'r')
                     {
-                        /*reserve a slot code segment*/
+                        Reserve_Slot();
                     }
                     else if(Admin_mode == 'c')
                     {
-                        /*cancel reservation code segment*/
+                        Cancel_Reservation();
                     }
                     else
                     {
@@ -136,6 +143,7 @@ void Add_Patient()
     scanf(" %[^\n]s",patient->Gender);
     printf("Enter your ID:");
     scanf("%d",&patient->ID);
+    patient -> Reservation_slot = 0;
 
     /*Check on the linkedlist*/
     if(Start == NULL)
@@ -223,5 +231,95 @@ void Edit_Patient()
     else 
 	{
         printf("Sorry, this ID does not exist. Please try again.\n");  // Patient with the given ID was not found 
+    }
+}
+
+//Reserve Slot Function Implementation
+void Reserve_Slot()
+{
+    int Patient_Found_Flag = 0;
+    int Patient_ID = 0;
+    int Slot = 0;
+
+    printf("Enter the ID of the patient to reserve a slot: ");
+    scanf("%d", &Patient_ID);
+
+    /* Searching for the patient with the given ID */
+    Patient_Info *Temp = Start;
+    while (Temp != NULL) 
+    {
+        if (Temp->ID == Patient_ID) 
+        {
+            Patient_Found_Flag = 1;
+            break;
+        }
+        Temp = Temp->Next;
+    }
+
+    if (Patient_Found_Flag == 1 && Temp -> Reservation_slot == 0) 
+    {
+        printf("These are the available Slots: \n");
+        for(int counter = 0; counter < 5; counter++)
+        {
+            if(available_slots[counter] == 0)      //Only print the available slots
+            {
+                printf(" %d- %s   ", counter + 1 ,slots[counter]);
+            }
+        }
+        printf("\nPlease, enter the number of the required slot: ");
+        scanf("%d",&Slot);
+        if(Slot >= 1 && Slot <= 5 && available_slots[Slot - 1] == 0)
+        {
+            Temp -> Reservation_slot = Slot;
+            available_slots[(Temp -> Reservation_slot) - 1] = 1;  //The entered Slot is not available any more
+        }
+        else
+        {
+            printf("You entered an invalid or reserved slot number \n");
+        }
+    }
+    else
+    {
+        printf("Sorry, this ID does not exist or there is already a reservation. Please try again.\n");
+    }
+
+}
+
+//Cancel Reservation Function Implementation
+void Cancel_Reservation()
+{
+    int Patient_Found_Flag = 0;
+    int Patient_ID = 0;
+
+    printf("Enter the ID of the patient to cancel reservation: ");
+    scanf("%d", &Patient_ID);
+
+    /* Searching for the patient with the given ID */
+    Patient_Info *Temp = Start;
+    while (Temp != NULL) 
+    {
+        if (Temp->ID == Patient_ID) 
+        {
+            Patient_Found_Flag = 1;
+            break;
+        }
+        Temp = Temp->Next;
+    }
+    if (Patient_Found_Flag == 1)
+    {
+        if(Temp -> Reservation_slot != 0)
+        {
+            available_slots[Temp -> Reservation_slot - 1] = 0;
+            Temp -> Reservation_slot = 0;
+            printf("Your reservation was cancelled successfully. \n");
+        }
+        else
+        {
+            printf("There is no reservations to be cancelled \n");
+        }
+    }
+    else
+    {
+        printf("Sorry, this ID does not exist. Please try again.\n");
     }
 }
