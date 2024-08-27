@@ -23,6 +23,8 @@ void Add_Patient();                      //Add Patient Function Prototype
 void Edit_Patient();                     //Edit Patient Function Prototype
 void Reserve_Slot();                     //Reserve Slot Function Protoype
 void Cancel_Reservation();               //Cancel Reservation Function Prototype
+void Patient_record();                   //view patient's record code segment
+void Today_reservations();                //view today's reservations code segment
 
 int main()
 {
@@ -40,7 +42,7 @@ int main()
     do   //main program loop
     {
         //Asking user for required mode
-        printf("For admin mode type \"a\" - For user mode type \"u\" - Type \"e\" to exit: ");
+        printf("\033[36mFor admin mode type \"a\" - For user mode type \"u\" - Type \"e\" to exit: \033[0m");
         scanf("  %c",&mode);
 
         if(mode == 'a')       //Checking for the required mode
@@ -49,11 +51,11 @@ int main()
             count = 0;        //Reseting count 
             while(count < 3 )
             {
-                printf("\033[33mPlease, Enter your password:\033[0m ");
+                printf("\033[36mPlease, Enter your password: \033[0m");
                 scanf("%d", &password);
                 if(password == Default_Admin_Password)
                 {
-                    printf("To add new patient record type \"a\" - To edit patient record type \"e\" - To reserve a slot type \"r\" - To Cancel a reservation type \"c\": ");
+                    printf("\033[36mTo add new patient record type \"a\" - To edit patient record type \"e\" - To reserve a slot type \"r\" - To Cancel a reservation type \"c\": \033[0m");
                     scanf("  %c", &Admin_mode);
                     if(Admin_mode == 'a')
                     {
@@ -73,14 +75,14 @@ int main()
                     }
                     else
                     {
-                        printf("Invalid Input\n");
+                        printf("\033[31mInvalid Input\033[0m\n");
                     }
                     count = 3;         //Updating count with a value not < 3 to exit the loop
                     password = 0;
                 }
                 else
                 {   
-                    printf("Incorrect Password. Please, Try again later\n");
+                    printf("\033[31mIncorrect Password. Please, Try again later\033[0m\n");
                     count++;
                 }
             }
@@ -89,19 +91,19 @@ int main()
         else if(mode == 'u')
         {
             /*User mode*/
-            printf("To view patient's record type \"p\" - To view today's reservations type \"r\": ");
+            printf("\033[36mTo view patient's record type \"p\" - To view today's reservations type \"r\": \033[0m");
             scanf("  %c",&User_mode);
             if(User_mode == 'p')
             {
-                /*view patient's record code segment*/
+                Patient_record();
             }
             else if (User_mode == 'r')
             {
-                /*view tody's reservations code segment*/
+                Today_reservations();
             }
             else
             {
-                printf("Invalid Input\n");
+                printf("\033[31mInvalid Input\033[0m\n");
             }
             mode = 0;         //Reseting mode to ask user again
         }
@@ -111,7 +113,7 @@ int main()
         }
         else                             //default case to avoid invalid inputs
         {
-            printf("Inavalid Input - Please try again\n");
+            printf("\033[31mInavalid Input - Please try again\033[0m\n");
         }
 
         //Printing exit message
@@ -135,13 +137,13 @@ void Add_Patient()
     patient -> Next = NULL;
 
     /*Scanning Information*/
-    printf("Enter your Name:");
+    printf("Enter The Name:");
     scanf(" %[^\n]s",patient->Name);
-    printf("Enter your Age:");
+    printf("Enter The Age:");
     scanf("%d",&patient->Age);
-    printf("Enter your Gender:");
+    printf("Enter The Gender:");
     scanf(" %[^\n]s",patient->Gender);
-    printf("Enter your ID:");
+    printf("Enter The ID:");
     scanf("%d",&patient->ID);
     patient -> Reservation_slot = 0;
 
@@ -186,7 +188,7 @@ void Add_Patient()
     else if(Already_Existing_ID_Flag == 1)
     {
         free(patient);
-        printf("Sorry, this ID already exists please try again\n");
+        printf("\033[31mSorry, this ID already exists please try again.\033[0m\n");
     }
 }
 void Edit_Patient()
@@ -230,7 +232,7 @@ void Edit_Patient()
     } 
     else 
 	{
-        printf("Sorry, this ID does not exist. Please try again.\n");  // Patient with the given ID was not found 
+        printf("\033[31mSorry, this ID does not exist. Please try again.\033[0m\n");  // Patient with the given ID was not found 
     }
 }
 
@@ -275,12 +277,12 @@ void Reserve_Slot()
         }
         else
         {
-            printf("You entered an invalid or reserved slot number \n");
+            printf("\033[31mYou entered an invalid or reserved slot number\033[0m\n");
         }
     }
     else
     {
-        printf("Sorry, this ID does not exist or there is already a reservation. Please try again.\n");
+        printf("\033[31mSorry, this ID does not exist or there is already a reservation. Please try again.\033[0m\n");
     }
 
 }
@@ -311,7 +313,7 @@ void Cancel_Reservation()
         {
             available_slots[Temp -> Reservation_slot - 1] = 0;
             Temp -> Reservation_slot = 0;
-            printf("Your reservation was cancelled successfully. \n");
+            printf("The reservation was cancelled successfully. \n");
         }
         else
         {
@@ -320,6 +322,57 @@ void Cancel_Reservation()
     }
     else
     {
-        printf("Sorry, this ID does not exist. Please try again.\n");
+        printf("\033[31mSorry, this ID does not exist. Please try again.\033[0m\n");
     }
+}
+void Patient_record()
+{
+   
+    int Patient_Found_Flag = 0;
+    int Patient_ID = 0;
+
+    printf("Please enter the ID: ");
+    scanf("%d", &Patient_ID);
+   
+    /* Searching for the patient with the given ID */
+    Patient_Info *Temp = Start;
+    while (Temp != NULL) 
+    {
+        if (Temp->ID == Patient_ID) 
+        {
+            Patient_Found_Flag = 1;
+            break;
+        }
+        Temp = Temp->Next;
+    }
+
+    if (Patient_Found_Flag == 1)  
+    {
+        printf(" Name: %s\n", Temp->Name);
+        printf(" Age: %d\n", Temp->Age);
+        printf(" Gender: %s\n", Temp->Gender);
+    } 
+    else 
+	{
+        printf("\033[31mSorry, this ID does not exist. Please try again.\033[0m\n");  // Patient with the given ID was not found 
+    }
+}
+void Today_reservations()
+{ 
+    int reservations_exist = 0;            // Check if any reservations exist
+    Patient_Info *Temp = Start;
+    while (Temp != NULL)
+    { 
+        if(Temp->Reservation_slot>0) 
+       {
+              reservations_exist = 1;
+              printf("Slot %d - %s:Is reserved by Patient : %s, ID: %d\n",  Temp->Reservation_slot, slots[Temp->Reservation_slot - 1], Temp->Name,
+              Temp->ID);
+        }
+     Temp = Temp->Next;
+    }
+if (reservations_exist ==0)
+{
+    printf("No reservations found for today\n ");
+}
 }
